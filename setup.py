@@ -8,4 +8,10 @@ setup(name='biomarker_survival',
       author_email='joans@alum.mit.edu',
       license='MIT',
       packages=['biomarker_survival'],
-      zip_safe=False)
+      zip_safe=False,
+      install_requires=[
+        'matplotlib',
+        'numpy',
+        'scipy',
+        'rpy2',
+        'pandas'])
