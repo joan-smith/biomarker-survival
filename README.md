@@ -11,7 +11,7 @@ To install Anaconda, follow instructions [here](https://docs.anaconda.com/anacon
 
 ```
 $ conda install -c r rpy2
-pip install biomarker-survival
+$ pip install biomarker-survival
 ```
 
 
