@@ -8,8 +8,12 @@ using the Anaconda package manager.
 
 To install Anaconda, follow instructions [here](https://docs.anaconda.com/anaconda/install/)
 
+
+```
 $ conda install -c r rpy2
-$ pip install biomarker-survival.
+pip install biomarker-survival
+```
+
 
 Please note that rpy2 has been deprecated, and so must be installed with Anaconda, not pip. 
 
