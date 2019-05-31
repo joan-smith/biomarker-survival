@@ -10,8 +10,7 @@ setup(name='biomarker_survival',
       packages=['biomarker_survival'],
       zip_safe=False,
       install_requires=[
-        'matplotlib',
-        'numpy',
-        'scipy',
-        'rpy2',
-        'pandas'])
+        'pandas==0.18',
+        'matplotlib==2.1.1',
+        'scipy==1.0.0',
+        'rpy2==2.8.6'])

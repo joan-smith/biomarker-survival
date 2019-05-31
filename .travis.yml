@@ -1,0 +1,10 @@
+language: python
+python: 2.7
+
+install:
+  - sudo apt-get install -y r-base
+  - echo 'source("survival")' > install.R
+  - python setup.py install
+
+
+script: pytest
