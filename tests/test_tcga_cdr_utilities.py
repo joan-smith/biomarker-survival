@@ -8,14 +8,13 @@ FIXTURE_DIR = os.path.join(
    'test_data',
   )
 @pytest.fixture(scope="module")
-# @pytest.mark.datafiles(os.path.join(FIXTURE_DIR, 'TCGA-CDR-SupplementalTableS1-2019-05-27.xlsx'))
 def tcga_cdr():
   path = os.path.join(FIXTURE_DIR, 'TCGA-CDR-SupplementalTableS1-2019-05-27.xlsx')
   return TCGA_CDR_util(path)
 
-# @pytest.mark.datafiles(os.path.join(FIXTURE_DIR, 'TCGA-CDR-SupplementalTableS1-2019-05-27.xlsx'))
 def test_read_table(tcga_cdr):
   assert tcga_cdr.df.shape == (11103, 33)
+  assert list(tcga_cdr.df.index)[0] == 'TCGA-OR-A5J1'
 
 testdata = [
   ['ACC', '', [92, 34, 58]],
@@ -62,3 +61,19 @@ def test_cancer_type_data(a, b, expected, tcga_cdr):
   assert ctype_df['censor'].sum() == event
   assert (ctype_df['censor'] == 0).sum() == censored
 
+def test_extra_cols(tcga_cdr):
+  df = tcga_cdr.cancer_type_data('BLCA',
+                extra_cols=['ajcc_pathologic_tumor_stage',  'histological_grade'])
+  assert df.shape == (409, 4)
+  assert list(df.columns) == ['censor', 'time',
+                        'ajcc_pathologic_tumor_stage', 'histological_grade']
+
+def test_all_cancers(tcga_cdr):
+  df = tcga_cdr.cancer_type_data('*')
+  assert df.shape == (11103, 3)
+  assert list(df.columns) == ['type', 'censor', 'time']
+
+def test_all_cancers_extra_cols(tcga_cdr):
+  df = tcga_cdr.cancer_type_data('*', extra_cols=['histological_grade'])
+  assert df.shape == (11103, 4)
+  assert list(df.columns) == ['type', 'censor', 'time', 'histological_grade']

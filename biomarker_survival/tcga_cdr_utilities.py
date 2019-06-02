@@ -30,27 +30,40 @@ class TCGA_CDR_util:
     df = pd.read_excel(self.tcga_cgr_table_path,
                        sheet_name=0,
                        header=0,
+                       index_col=1,
                        na_values=['[Not Applicable]', '[Not Available]'])
     df = df[df['Redaction'].isnull()]
     return df
 
-  def cancer_type_data(self, cancer_type, extra_data=[]):
+  def recommended_endpoint(self, cancer_type):
+    endpoint = 'OS'
+    if cancer_type in self.RECOMMENDED_ENDPOINTS:
+      endpoint = self.RECOMMENDED_ENDPOINTS[cancer_type]
+    return endpoint
+
+  def cancer_type_data(self, cancer_type, extra_cols=[]):
     """
     Given a path to the TCGA-CDR Supplemental Table 1, and a cancer type, produce a pandas dataframe
     with the recommended time/censor columns and any extra clinical data explicitly requested.
 
     For all cancer types, cancer_type='*'
     """
+    result_cols = ['censor', 'time'] + extra_cols
+
     if cancer_type == '*':
-      raise NotImplementedError
+      all_cancers = pd.DataFrame(columns=['type', 'censor', 'time'] + extra_cols)
+      for t in self.df['type'].unique():
+        endpoint = self.recommended_endpoint(t)
+        cols = ['type', endpoint, endpoint + '.time'] + extra_cols
+        ctype_df = self.df[self.df['type'] == t][cols]
+        ctype_df.columns = ['type'] + result_cols
+        all_cancers = all_cancers.append(ctype_df)
+      return all_cancers
 
     ctype_df = self.df[self.df['type'] == cancer_type]
+    endpoint = self.recommended_endpoint(cancer_type)
 
-    endpoint = 'OS'
-    if cancer_type in self.RECOMMENDED_ENDPOINTS:
-      endpoint = self.RECOMMENDED_ENDPOINTS[cancer_type]
-
-    ctype_df = ctype_df[[endpoint, endpoint + '.time']]
-    ctype_df.columns = ['censor', 'time']
+    ctype_df = ctype_df[[endpoint, endpoint + '.time'] + extra_cols]
+    ctype_df.columns = result_cols
     return ctype_df
 
