@@ -18,62 +18,75 @@ def test_read_table(tcga_cdr):
 
 testdata = [
   ['ACC', '', [92, 34, 58]],
-  ['BLCA', '',  [409, 179, 230]],
-  ['BRCA', '', [1092, 145, 947]],
+  ['BLCA', '',  [408, 178, 230]],
+  ['BRCA', '', [1091, 145, 946]],
   ['CESC', '', [307, 71, 236]],
   ['CHOL', '', [45, 22, 23]],
-  ['COAD', '', [458, 102, 356]],
+  ['COAD', '', [457, 102, 355]],
   ['DLBC', '', [48, 12, 36]],
   ['ESCA', '', [185, 77, 108]],
   ['GBM', '', [595, 490, 105]],
-  ['HNSC', '', [528, 223, 305]],
-  ['KICH', '', [113, 13, 100]],
+  ['HNSC', '', [527, 223, 304]],
+  ['KICH', '', [112, 12, 100]],
   ['KIRC', '', [537, 177, 360]],
-  ['KIRP', '', [291, 44, 247]],
-  ['LAML', '', [200, 133, 67]],
-  ['LGG', '', [515, 192, 323]],
-  ['LIHC', '', [376, 131, 245]],
-  ['LUAD', '', [522, 188, 334]],
-  ['LUSC', '', [504, 219, 285]],
-  ['MESO', '', [87, 74, 13]],
-  ['OV', '', [542, 322, 218]],
+  ['KIRP', '', [290, 44, 246]],
+  ['LAML', '', [186, 120, 66]],
+  ['LGG', '', [514, 192, 322]],
+  ['LIHC', '', [375, 131, 244]],
+  ['LUAD', '', [513, 184, 329]],
+  ['LUSC', '', [498, 215, 283]],
+  ['MESO', '', [86, 73, 13]],
+  ['OV', '', [538, 322, 216]],
   ['PAAD', '', [185, 100, 85]],
   ['PCPG', '', [179, 21, 158]],
   ['PRAD', '', [500, 93, 407]],
   ['READ', '', [170, 39, 131]],
   ['SARC', '', [261, 99, 162]],
-  ['SKCM', '', [470, 216, 247]],
-  ['STAD', '', [443, 172, 271]],
+  ['SKCM', '', [455, 214, 241]],
+  ['STAD', '', [437, 169, 268]],
   ['TGCT', '', [134, 35, 99]],
   ['THCA', '', [507, 52, 455]],
-  ['THYM', '', [124, 22, 102]],
-  ['UCEC', '', [547, 91, 456]],
+  ['THYM', '', [123, 22, 101]],
+  ['UCEC', '', [546, 91, 455]],
   ['UCS', '', [57, 35, 22]],
   ['UVM', '', [80, 23, 57]]
 ]
 
 @pytest.mark.parametrize("a,b,expected", testdata, ids=[i[0] for i in testdata])
-def test_cancer_type_data(a, b, expected, tcga_cdr):
+def test_cancer_type_patients(a, b, expected, tcga_cdr):
   ctype, _ = a, b
   ctype_df  = tcga_cdr.cancer_type_data(a)
   patients, event, censored = expected
   assert ctype_df.shape == (patients, 2)
+
+@pytest.mark.parametrize("a,b,expected", testdata, ids=[i[0] for i in testdata])
+def test_cancer_type_event(a, b, expected, tcga_cdr):
+  ctype, _ = a, b
+  ctype_df  = tcga_cdr.cancer_type_data(a)
+  patients, event, censored = expected
   assert ctype_df['censor'].sum() == event
+
+@pytest.mark.parametrize("a,b,expected", testdata, ids=[i[0] for i in testdata])
+def test_cancer_type_censored(a, b, expected, tcga_cdr):
+  ctype, _ = a, b
+  ctype_df  = tcga_cdr.cancer_type_data(a)
+  patients, event, censored = expected
   assert (ctype_df['censor'] == 0).sum() == censored
+
 
 def test_extra_cols(tcga_cdr):
   df = tcga_cdr.cancer_type_data('BLCA',
                 extra_cols=['ajcc_pathologic_tumor_stage',  'histological_grade'])
-  assert df.shape == (409, 4)
+  assert df.shape == (408, 4)
   assert list(df.columns) == ['censor', 'time',
                         'ajcc_pathologic_tumor_stage', 'histological_grade']
 
 def test_all_cancers(tcga_cdr):
   df = tcga_cdr.cancer_type_data('*')
-  assert df.shape == (11103, 3)
+  assert df.shape == (11038, 3)
   assert list(df.columns) == ['type', 'censor', 'time']
 
 def test_all_cancers_extra_cols(tcga_cdr):
   df = tcga_cdr.cancer_type_data('*', extra_cols=['histological_grade'])
-  assert df.shape == (11103, 4)
+  assert df.shape == (11038, 4)
   assert list(df.columns) == ['type', 'censor', 'time', 'histological_grade']

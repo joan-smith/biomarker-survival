@@ -41,6 +41,9 @@ class TCGA_CDR_util:
       endpoint = self.RECOMMENDED_ENDPOINTS[cancer_type]
     return endpoint
 
+  def cancer_types(self):
+    return self.df['type'].unique()
+
   def cancer_type_data(self, cancer_type, extra_cols=[]):
     """
     Given a path to the TCGA-CDR Supplemental Table 1, and a cancer type, produce a pandas dataframe
@@ -58,12 +61,13 @@ class TCGA_CDR_util:
         ctype_df = self.df[self.df['type'] == t][cols]
         ctype_df.columns = ['type'] + result_cols
         all_cancers = all_cancers.append(ctype_df)
-      return all_cancers
+      return all_cancers.dropna(how='any', subset=['time', 'censor'])
 
     ctype_df = self.df[self.df['type'] == cancer_type]
     endpoint = self.recommended_endpoint(cancer_type)
 
     ctype_df = ctype_df[[endpoint, endpoint + '.time'] + extra_cols]
     ctype_df.columns = result_cols
+    ctype_df = ctype_df.dropna(how='any', subset=['time', 'censor'])
     return ctype_df
 
