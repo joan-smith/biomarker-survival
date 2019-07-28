@@ -104,7 +104,10 @@ def do_cox(time, censor, split, float_time=False):
   r.assign('censor', robjects.IntVector(np.array(censor)))
   r.assign('split', robjects.FloatVector(np.array(split)))
 
-  coxuh_output = r('summary( coxph(formula = Surv(time, censor) ~ split, model=FALSE, x=FALSE, y=FALSE))')
+  try:
+    coxuh_output = r('summary( coxph(formula = Surv(time, censor) ~ split, model=FALSE, x=FALSE, y=FALSE))')
+  except ri.RRuntimeError as e:
+    return {}
 
   coef_ind = list(coxuh_output.names).index('coefficients')
   coeffs = coxuh_output[coef_ind]
