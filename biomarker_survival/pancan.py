@@ -9,7 +9,7 @@ import analysis
 
 def pancan(cancer_types_dir):
   files = os.listdir(cancer_types_dir)
-  ctype = re.compile('([A-Z]+)_.*out.csv')
+  ctype = re.compile('([A-Z]+).*.zscores.out.csv')
 
   pancan_dict = {}
   for f in files:
@@ -23,10 +23,9 @@ def pancan(cancer_types_dir):
     if df.shape[0] > 0:
       if '\'' not in df.index[0]:
         # ADD ' to index
-        df = df.reset_index()
-        print 'ADD apostrophe'
+        df.reset_index(inplace=True)
         df['gene'] = '\'' + df['gene']
-        df = df.set_index('gene')
+        df.set_index('gene', inplace=True)
       pancan_dict[cancer_type] = df['z'].astype(float)
 
   pancan_df = pd.DataFrame(pancan_dict)

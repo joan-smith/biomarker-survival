@@ -9,15 +9,23 @@ FIXTURE_DIR = os.path.join(
   )
 
 @pytest.fixture(scope="module")
-def cancer_type_dir():
+def pancan_data():
   path = os.path.join(FIXTURE_DIR, 'pancan')
   return path
 
-def test_pancan(cancer_type_dir):
-  pancan_df = pancan(cancer_type_dir)
+def test_pancan_mutations(pancan_data):
+  pancan_df = pancan(os.path.join(pancan_data, 'pancan_mutations'))
 
-  print pancan_df.columns
   assert pancan_df.shape == (11825, 12)
   assert 'stouffer unweighted' in list(pancan_df.columns)
   assert 'ACC' in list(pancan_df.columns)
   assert pancan_df['ACC'].count() == 1708
+
+
+def test_pancan_rnaseq(pancan_data):
+  pancan_df = pancan(os.path.join(pancan_data, 'pancan_rnaseq'))
+
+  assert pancan_df.shape == (20531, 10)
+  assert 'stouffer unweighted' in list(pancan_df.columns)
+  assert 'ACC' in list(pancan_df.columns)
+  assert pancan_df['ACC'].count() == 19800
