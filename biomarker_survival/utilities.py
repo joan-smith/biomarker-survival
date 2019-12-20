@@ -3,7 +3,7 @@ import numpy as np
 import sys
 import os
 
-#from matplotlib import pyplot
+from matplotlib import pyplot
 #pyplot.switch_backend('agg')
 
 PRIMARY_TUMOR_PATIENT_ID_REGEX = '^.{4}-.{2}-.{4}-01.*'
