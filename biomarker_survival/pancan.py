@@ -4,7 +4,7 @@ import sys
 import os
 import re
 
-import analysis
+from . import analysis
 
 
 def pancan(cancer_types_dir):

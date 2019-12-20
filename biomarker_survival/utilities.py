@@ -53,7 +53,7 @@ def get_sep_from_filename(filename):
   if '.txt' in filename:
     return '\t'
 
-  print 'Unknown separator for filename', filename
+  print('Unknown separator for filename', filename)
   sys.exit(1)
 
 
@@ -65,7 +65,6 @@ def maybe_clear_non_01s(df, patient_column, cancer_type):
   If the input file is an LAML file, don't drop any samples.
 
   This utility should be called before doing other processing on the data.
-  This utility should be called before doing other processing on the data.
 
   Args:
     df: genomic features data
@@ -76,16 +75,16 @@ def maybe_clear_non_01s(df, patient_column, cancer_type):
     df: same dataframe, with inelligble rows removed
   """
   non_01_barcodes = df[~df[patient_column].str.contains(PRIMARY_TUMOR_PATIENT_ID_REGEX)][patient_column]
-  print 'Number of barcodes ending in not -01: ', non_01_barcodes.unique().shape[0]
+  print('Number of barcodes ending in not -01: ', non_01_barcodes.unique().shape[0])
 
   if non_01_barcodes.count() > 0 and 'SKCM' in cancer_type:
-    print 'SKCM drops'
+    print('SKCM drops')
     return process_SKCM_df(df, patient_column)
   elif cancer_type == 'LAML':
-    print 'LAML returning with no drops'
+    print('LAML returning with no drops')
     return df
   else:
-    print 'Dropping non-01 barcodes'
+    print('Dropping non-01 barcodes')
     return df.drop(non_01_barcodes.index)
 
 def add_identifier_column(df, patient_column):
@@ -108,7 +107,7 @@ def get_clinical_data(clinical_file, extra_rows=None, extra_rows_numeric=True):
   endpoint_label = 'patient.days_to_death'
   if cancer_type in ENDPOINT_OVERRIDE_BY_CANCER_TYPE:
     endpoint_label = ENDPOINT_OVERRIDE_BY_CANCER_TYPE[cancer_type]
-  print cancer_type, endpoint_label, procurement_label
+  print(cancer_type, endpoint_label, procurement_label)
 
   extra_rows_data = {}
   with open(clinical_file, 'rU') as f:
@@ -132,9 +131,9 @@ def get_clinical_data(clinical_file, extra_rows=None, extra_rows_numeric=True):
   if len(days_to_procurement) == 0:
     days_to_procurement = [0]*len(days_to_death)
 
-  data = zip(identifiers, days_to_death, days_to_last_followup, days_to_procurement)
+  data = list(zip(identifiers, days_to_death, days_to_last_followup, days_to_procurement))
   if extra_rows:
-    data = zip(identifiers, days_to_death, days_to_last_followup, days_to_procurement, *[extra_rows_data[k] for k in extra_rows])
+    data = list(zip(identifiers, days_to_death, days_to_last_followup, days_to_procurement, *[extra_rows_data[k] for k in extra_rows]))
   orig_identifiers = identifiers
 
   # This is where clinical data gets cleaned up from being full of silliness to being usable.
@@ -175,9 +174,9 @@ def make_histogram(histogram_data, outdir, permutation_count=None, show=False):
   pyplot.title(outdir)
   pyplot.savefig(os.path.join(outdir, 'pancan_histogram.png'))
 
-  print outdir
-  print minimum
-  print maximum
+  print(outdir)
+  print(minimum)
+  print(maximum)
   if show:
     pyplot.show()
 
@@ -239,7 +238,7 @@ def process_SKCM_df(df, patient_column):
   1. remove a row if it is neither a primary tumor nor a metastasis
   2. remove a row if it is a metastasis, but there exists data for the primary tumor from the same patient
   """
-  print 'Processing for SKCM'
+  print('Processing for SKCM')
   # Remove all non-01 and non-06 rows
   non_01_barcodes = df[~df[patient_column].str.contains(PRIMARY_TUMOR_PATIENT_ID_REGEX)][patient_column]
   non_01_non_06 = non_01_barcodes[~non_01_barcodes.str.contains(METASTASIS)]
@@ -260,7 +259,7 @@ def process_SKCM_df(df, patient_column):
   index_of_metastasis_with_primaries = metastasis_ids[metastasis_ids['identifier'].isin(metastasis_with_primaries)].index
   # yay. 5 alarming lines later, drop the duplicate metastasis.
   df = df.drop(index_of_metastasis_with_primaries)
-  print 'With only non-duplicated metastasis', len(df['identifier'].unique())
+  print('With only non-duplicated metastasis', len(df['identifier'].unique()))
   df = df.drop('identifier', 1) # hacks. Drop the identifier index so we can add it back later :|
   return df
 
