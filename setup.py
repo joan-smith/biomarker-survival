@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 # note: tzlocal is an rpy2 dependency that's left out of the rpy2 spec.
 setup(name='biomarker_survival',
-      version='0.2',
+      version='0.2.1',
       description='Utilities for performing biomarker survival analyses',
       url='http://github.com/joansmith/biomarker-survival',
       author='Joan Smith',
