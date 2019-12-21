@@ -9,11 +9,7 @@ import rpy2.robjects.pandas2ri as pandas2ri
 import rpy2.robjects as robjects
 from rpy2.robjects import r
 
-from matplotlib import pyplot
-
 import rpy2.rinterface as ri
-
-
 rpy2.robjects.numpy2ri.activate()
 
 class KMPlot:

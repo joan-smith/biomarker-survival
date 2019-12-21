@@ -13,10 +13,10 @@ setup(name='biomarker_survival',
       zip_safe=False,
       setup_requires=['pytest-runner'],
       install_requires=[
-        'pandas==0.25.1',
-        'matplotlib',
-        'scipy==1.3.1',
+        'pandas>=0.25.1',
         'rpy2==2.9.4',
+        'matplotlib',
+        'scipy>=1.3.1',
         'tzlocal',
         'xlrd'],
       tests_require=['pytest', 'pytest-datafiles'])
