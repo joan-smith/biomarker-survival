@@ -3,9 +3,6 @@ import numpy as np
 import sys
 import os
 
-from matplotlib import pyplot
-#pyplot.switch_backend('agg')
-
 PRIMARY_TUMOR_PATIENT_ID_REGEX = '^.{4}-.{2}-.{4}-01.*'
 METASTASIS =  '^.{4}-.{2}-.{4}-06.*'
 
@@ -158,6 +155,9 @@ def remove_extraneous_files(files):
 
 
 def make_histogram(histogram_data, outdir, permutation_count=None, show=False):
+  from matplotlib import pyplot
+  pyplot.switch_backend('agg')
+
   minimum = min(histogram_data)
   maximum = max(histogram_data)
 
