@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 # note: tzlocal is an rpy2 dependency that's left out of the rpy2 spec.
 setup(name='biomarker_survival',
-      version='0.2.1',
+      version='0.2.2',
       description='Utilities for performing biomarker survival analyses',
       url='http://github.com/joansmith/biomarker-survival',
       author='Joan Smith',
@@ -18,6 +18,6 @@ setup(name='biomarker_survival',
         'matplotlib',
         'scipy>=1.3.1',
         'tzlocal',
-        'xlrd'],
+        'openpyxl'],
       tests_require=['pytest', 'pytest-datafiles'])
 
