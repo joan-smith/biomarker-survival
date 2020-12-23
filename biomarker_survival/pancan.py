@@ -7,9 +7,13 @@ import re
 from . import analysis
 
 
-def pancan(cancer_types_dir):
+def pancan(cancer_types_dir, multivariate=False):
   files = os.listdir(cancer_types_dir)
   ctype = re.compile('([A-Z]+).*.zscores.out.csv')
+
+  z_name = 'z'
+  if multivariate:
+    z_name = 'var-z'
 
   pancan_dict = {}
   for f in files:
@@ -26,7 +30,7 @@ def pancan(cancer_types_dir):
         df.reset_index(inplace=True)
         df['gene'] = '\'' + df['gene']
         df.set_index('gene', inplace=True)
-      pancan_dict[cancer_type] = df['z'].astype(float)
+      pancan_dict[cancer_type] = df[z_name].astype(float)
 
   pancan_df = pd.DataFrame(pancan_dict)
   pancan_df['stouffer unweighted'] = analysis.stouffer_unweighted(pancan_df)
