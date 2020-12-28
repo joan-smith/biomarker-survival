@@ -30,7 +30,8 @@ def pancan(cancer_types_dir, multivariate=False):
         df.reset_index(inplace=True)
         df['gene'] = '\'' + df['gene']
         df.set_index('gene', inplace=True)
-      pancan_dict[cancer_type] = df[z_name].astype(float)
+      if z_name in df:
+        pancan_dict[cancer_type] = df[z_name].astype(float)
 
   pancan_df = pd.DataFrame(pancan_dict)
   pancan_df['stouffer unweighted'] = analysis.stouffer_unweighted(pancan_df)

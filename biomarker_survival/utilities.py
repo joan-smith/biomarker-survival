@@ -87,7 +87,7 @@ def maybe_clear_non_01s(df, patient_column, cancer_type):
 def add_identifier_column(df, patient_column):
   """Given a data frame and a patient column, add 'identifier' column with the shortened, standard patient id."""
   shortened_patients = df[patient_column].str.extract(SHORTEN_PATIENT_REGEX, expand=False)
-  df['identifier'] = shortened_patients
+  df.loc[:,'identifier'] = shortened_patients
   return df
 
 def get_clinical_data(clinical_file, extra_rows=None, extra_rows_numeric=True):

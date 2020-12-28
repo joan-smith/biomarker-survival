@@ -54,11 +54,8 @@ def prep_mutation_data(mutation, clinical_data, cancer_type):
   mutation, clinical_data_w_seq_patients, num_patients = prep_data(mutation, clinical_data, cancer_type)
   mutation = drop_non_synonymous(mutation)
 
-
   mutation = mutation.reset_index()
   mutation['Hugo_Symbol'] = '\'' + mutation['Hugo_Symbol'].astype(str)
-
-
 
   return pivot_mutation_list_to_mutations_per_gene(mutation)
 
