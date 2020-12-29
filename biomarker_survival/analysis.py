@@ -142,7 +142,12 @@ def do_metagene_cox(time, censor, split, metagene):
   r.assign('split', robjects.FloatVector(np.array(df['split'])))
   r.assign('metagene', robjects.FloatVector(np.array(df['metagene'])))
 
-  coxuh_output = r('summary( coxph(formula = Surv(time, censor) ~ split + metagene, model=FALSE, x=FALSE, y=FALSE))')
+
+  try:
+    coxuh_output = r('summary( coxph(formula = Surv(time, censor) ~ split + metagene, model=FALSE, x=FALSE, y=FALSE))')
+  except ri.RRuntimeError as e:
+    print(e)
+    return {}
 
   coef_ind = list(coxuh_output.names).index('coefficients')
   coeffs = coxuh_output[coef_ind]
@@ -185,7 +190,13 @@ def do_multivariate_cox(time, censor, var, additional_vars, float_vars=False):
   additional_vars_str = ' + '.join(additional_vars.columns)
 
   formula = 'Surv(time, censor) ~ var + ' + additional_vars_str
-  coxuh_output = r('summary( coxph(formula = ' + formula + ', model=FALSE, x=FALSE, y=FALSE))')
+  try:
+    coxuh_output = r('summary( coxph(formula = ' + formula + ', model=FALSE, x=FALSE, y=FALSE))')
+  except ri.RRuntimeError as e:
+    print(e)
+    print(var.describe())
+    print(additional_vars.columns)
+    return {}
 
   coef_ind = list(coxuh_output.names).index('coefficients')
   coeffs = coxuh_output[coef_ind]

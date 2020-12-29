@@ -36,20 +36,26 @@ def mutations_for_gene(df):
   mutated_patients = df['identifier'].unique()
   return pd.DataFrame({'mutated': np.ones(len(mutated_patients))}, index=mutated_patients)
 
-def prep_mutation_data(mutation, clinical_data, cancer_type):
-  mutation, clinical_data_w_seq_patients, num_patients = prep_data(mutation, clinical_data, cancer_type)
-
+def drop_non_synonymous(mutation):
   # include only nonsilent mutations
   non_silent = mutation.where(mutation['Variant_Classification'] != 'Silent')
   mutation = non_silent.dropna(subset=['Variant_Classification'])
+  return mutation
 
-  mutation = mutation.reset_index()
-  mutation['Hugo_Symbol'] = '\'' + mutation['Hugo_Symbol'].astype(str)
-
+def pivot_mutation_list_to_mutations_per_gene(mutation):
   gene_mutation_df = mutation.groupby(['Hugo_Symbol']).apply(mutations_for_gene)
   gene_mutation_df.index.set_names(['Hugo_Symbol', 'patient'], inplace=True)
   gene_mutation_df = gene_mutation_df.reset_index()
   gene_patient_mutations = gene_mutation_df.pivot(index='Hugo_Symbol', columns='patient', values='mutated')
 
   return gene_patient_mutations.transpose().fillna(0)
+
+def prep_mutation_data(mutation, clinical_data, cancer_type):
+  mutation, clinical_data_w_seq_patients, num_patients = prep_data(mutation, clinical_data, cancer_type)
+  mutation = drop_non_synonymous(mutation)
+
+  mutation = mutation.reset_index()
+  mutation['Hugo_Symbol'] = '\'' + mutation['Hugo_Symbol'].astype(str)
+
+  return pivot_mutation_list_to_mutations_per_gene(mutation)
 

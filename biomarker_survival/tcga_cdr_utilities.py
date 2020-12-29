@@ -31,7 +31,8 @@ class TCGA_CDR_util:
                        sheet_name=0,
                        header=0,
                        index_col=1,
-                       na_values=['[Not Applicable]', '[Not Available]'])
+                       na_values=['[Not Applicable]', '[Not Available]'],
+                       engine='openpyxl')
     df = df[df['Redaction'].isnull()]
     return df
 
