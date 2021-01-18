@@ -15,6 +15,7 @@ rpy2.robjects.numpy2ri.activate()
 class KMPlot:
   def __init__(self):
     self.surv = importr('survival')
+    self.gfortify = importr('ggfortify')
 
   def make_plottable_kms(self, time, percent):
     time =  list(time)
@@ -49,17 +50,12 @@ class KMPlot:
 
     km = self.surv.survfit(robjects.Formula('Surv(time, censor) ~ high'),
                 data=df)
-    summary = pandas2ri.ri2py(r.summary(km, extend=True))
-    r.assign('km', km)
-    r.assign('times', data['time'])
-    r.assign('res', r('summary(km, times=times)'))
-    cols = r('lapply(c(2:6, 8:11), function(x) res[x])')
-    r.assign('cols', cols)
-    km_results = r('do.call(data.frame, cols)')
-    km_results = pd.DataFrame(km_results)
+    fortified = r('fortify(km)')
+    km_results = pd.DataFrame.from_records(fortified)
 
-    low_km = km_results[km_results['strata']=='high=0']
-    high_km = km_results[km_results['strata']=='high=1']
+
+    low_km = km_results[km_results['strata']=='0']
+    high_km = km_results[km_results['strata']=='1']
 
     high_time, high_percent = self.make_plottable_kms(high_km['time'], high_km['surv'])
     low_time, low_percent = self.make_plottable_kms(low_km['time'], low_km['surv'])
@@ -68,8 +64,6 @@ class KMPlot:
     low = [{'percent': i[0], 'time': i[1]} for i in zip(low_percent, low_time)]
 
     return {'high': high, 'low': low, 'p': float('%.4g' % pvalue)}
-
-
 
 
 def do_km(name, time, censor, split, outdir):
