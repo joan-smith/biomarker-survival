@@ -7,7 +7,7 @@ def prep_mutation_data_alone(mutation):
   df = pd.read_csv(mutation, sep='\t', low_memory=True, dtype=str)
 
   # remove column headers from combined mutation sheet
-  df = df[~df['Hugo_Symbol'].str.contains('Hugo_Symbol')]
+  df = df[~df['Hugo_Symbol'].str.contains('Hugo_Symbol')].copy(deep=True)
   df['Tumor_Sample_Barcode'] = df['Tumor_Sample_Barcode'].str.strip()
 
   number_barcodes_in_mutation_data = df['Tumor_Sample_Barcode'].unique().size
@@ -17,7 +17,7 @@ def prep_mutation_data_alone(mutation):
 
 
 def prep_data(df, clinical_data, cancer_type):
-  df = util.maybe_clear_non_01s(df, 'Tumor_Sample_Barcode', cancer_type)
+  df = util.maybe_clear_non_01s(df, 'Tumor_Sample_Barcode', cancer_type).copy(deep=True)
   df = util.add_identifier_column(df, 'Tumor_Sample_Barcode')
 
   # Reduce mutation data to patients that also have clinical data
@@ -36,7 +36,7 @@ def mutations_for_gene(df):
   mutated_patients = df['identifier'].unique()
   return pd.DataFrame({'mutated': np.ones(len(mutated_patients))}, index=mutated_patients)
 
-def drop_non_synonymous(mutation):
+def drop_non_silent(mutation):
   # include only nonsilent mutations
   non_silent = mutation.where(mutation['Variant_Classification'] != 'Silent')
   mutation = non_silent.dropna(subset=['Variant_Classification'])
@@ -52,7 +52,7 @@ def pivot_mutation_list_to_mutations_per_gene(mutation):
 
 def prep_mutation_data(mutation, clinical_data, cancer_type):
   mutation, clinical_data_w_seq_patients, num_patients = prep_data(mutation, clinical_data, cancer_type)
-  mutation = drop_non_synonymous(mutation)
+  mutation = drop_non_silent(mutation)
 
   mutation = mutation.reset_index()
   mutation['Hugo_Symbol'] = '\'' + mutation['Hugo_Symbol'].astype(str)
