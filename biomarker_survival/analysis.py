@@ -36,34 +36,39 @@ class KMPlot:
     mean_value = values_df.value.mean()
     values_df['high'] = values_df.value >= mean_value
 
-    data = {'time': robjects.FloatVector(values_df['time']),
-            'censor': robjects.IntVector(values_df['censor']),
-            'high': robjects.IntVector(values_df['high'])}
-    df = robjects.DataFrame(data)
+    try:
+      data = {'time': robjects.FloatVector(values_df['time']),
+              'censor': robjects.IntVector(values_df['censor']),
+              'high': robjects.IntVector(values_df['high'])}
+      df = robjects.DataFrame(data)
 
-    # p value
-    km_diff = self.surv.survdiff(robjects.Formula('Surv(time, censor) ~ high'),
-                data=df)
-    chisq_ind = list(km_diff.names).index('chisq')
-    pvalue = chi2.sf(km_diff[chisq_ind][0],1)
+      # p value
+      km_diff = self.surv.survdiff(robjects.Formula('Surv(time, censor) ~ high'),
+                  data=df)
+      chisq_ind = list(km_diff.names).index('chisq')
+      pvalue = chi2.sf(km_diff[chisq_ind][0],1)
+
+      #https://stackoverflow.com/questions/31198584/r-extract-summary-table-from-survfit-with-strata
+      km = self.surv.survfit(robjects.Formula('Surv(time, censor) ~ high'),
+                  data=df)
+      r.assign('km', km)
+      fortified = r('fortify(km)')
+      km_results = pd.DataFrame.from_records(fortified)
 
 
-    km = self.surv.survfit(robjects.Formula('Surv(time, censor) ~ high'),
-                data=df)
-    fortified = r('fortify(km)')
-    km_results = pd.DataFrame.from_records(fortified)
+      low_km = km_results[km_results['strata']=='0']
+      high_km = km_results[km_results['strata']=='1']
 
+      high_time, high_percent = self.make_plottable_kms(high_km['time'], high_km['surv'])
+      low_time, low_percent = self.make_plottable_kms(low_km['time'], low_km['surv'])
 
-    low_km = km_results[km_results['strata']=='0']
-    high_km = km_results[km_results['strata']=='1']
+      high = [{'percent': i[0], 'time': i[1]} for i in zip(high_percent, high_time)]
+      low = [{'percent': i[0], 'time': i[1]} for i in zip(low_percent, low_time)]
 
-    high_time, high_percent = self.make_plottable_kms(high_km['time'], high_km['surv'])
-    low_time, low_percent = self.make_plottable_kms(low_km['time'], low_km['surv'])
-
-    high = [{'percent': i[0], 'time': i[1]} for i in zip(high_percent, high_time)]
-    low = [{'percent': i[0], 'time': i[1]} for i in zip(low_percent, low_time)]
-
-    return {'high': high, 'low': low, 'p': float('%.4g' % pvalue)}
+      return {'high': high, 'low': low, 'p': float('%.4g' % pvalue)}
+    except ri.RRuntimeError as e:
+      print(e)
+      return {}
 
 
 def do_km(name, time, censor, split, outdir):
