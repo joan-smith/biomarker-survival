@@ -34,6 +34,7 @@ def pancan(cancer_types_dir, multivariate=False):
         pancan_dict[cancer_type] = df[z_name].astype(float)
 
   pancan_df = pd.DataFrame(pancan_dict)
+  pancan_df = pancan_df.reindex(sorted(pancan_df.columns), axis=1)
   pancan_df['stouffer unweighted'] = analysis.stouffer_unweighted(pancan_df)
   return pancan_df
 
