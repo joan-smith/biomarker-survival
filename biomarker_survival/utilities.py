@@ -146,7 +146,7 @@ def get_clinical_data(clinical_file, extra_rows=None, extra_rows_numeric=True):
   return make_clinical_df(data, extra_rows)
 
 def get_cancer_type(f):
-  return os.path.basename(f).split('.')[0]
+  return os.path.basename(f).split('.')[0].split('_')[0]
 
 def remove_extraneous_files(files):
   if '.DS_Store' in files:

@@ -3,14 +3,12 @@ import pandas as pd
 import os
 from scipy.stats.distributions import chi2
 
+import rpy2
 from rpy2.robjects.packages import importr
-import rpy2.robjects.numpy2ri
-import rpy2.robjects.pandas2ri as pandas2ri
 import rpy2.robjects as robjects
 from rpy2.robjects import r
 
 import rpy2.rinterface as ri
-rpy2.robjects.numpy2ri.activate()
 
 class KMPlot:
   def __init__(self):
@@ -227,13 +225,13 @@ def do_multivariate_cox(time, censor, var, additional_vars, float_vars=False):
 # inconsistencies.
 def get_zscore(variate, coeffs):
   zscore = coeffs.rx(variate, 'z')[0]
-  if type(zscore) == ri.NARealType:
+  if type(zscore) == rpy2.rinterface_lib.sexp.NARealType:
     zscore = np.nan
   return zscore
 
 def get_pvalue(variate, coeffs):
   pvalue = coeffs.rx(variate, 'Pr(>|z|)')[0]
-  if type(pvalue) == ri.NARealType:
+  if type(pvalue) == rpy2.rinterface_lib.sexp.NARealType:
     pvalue = np.nan
   return pvalue
 
